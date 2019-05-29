@@ -356,10 +356,10 @@ MonoThread *get_current_thread() {
 }
 
 void runtime_object_init(MonoObject *p_this_obj) {
-	GD_MONO_BEGIN_RUNTIME_INVOKE;
-	// FIXME: Do not use mono_runtime_object_init, it aborts if an exception is thrown
-	mono_runtime_object_init(p_this_obj);
-	GD_MONO_END_RUNTIME_INVOKE;
+	GDMonoClass *klass = GDMono::get_singleton()->get_class(mono_object_get_class(p_this_obj));
+	GDMonoMethod *ctor = klass->get_method(".ctor", 0);
+	ERR_FAIL_NULL(ctor);
+	ctor->invoke_raw(p_this_obj, NULL, NULL);
 }
 
 GDMonoClass *get_object_class(MonoObject *p_object) {
